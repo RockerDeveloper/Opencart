@@ -1,3 +1,5 @@
+package test;
+
 import org.junit.experimental.ParallelComputer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
