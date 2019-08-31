@@ -1,13 +1,10 @@
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 
 import java.awt.*;
-//sddsa
-@Execution(ExecutionMode.CONCURRENT)
+
+
 @Tag("Opencart")
-//@RunWith(JUnitPlatform.class)
 public class OpenCartTest {
     private AddToCart meth = new AddToCart();
 

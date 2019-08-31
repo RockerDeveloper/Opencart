@@ -1,6 +1,9 @@
+import base.BaseTest;
 import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideDriver;
+import com.codeborne.selenide.WebDriverRunner;
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,109 +15,67 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
-import io.restassured.RestAssured;
-
-import static org.junit.Assert.assertNotEquals;
+import static com.codeborne.selenide.Selenide.$;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class AddToCart {
+public class AddToCart extends BaseTest {
     private String EMAIL = "chapchaimax@gmail.com";
     private String PASSWORD = "ocozliaes";
 
-    // By.className("dropdown")
-//    public void LogIn() throws InterruptedException {
-//        System.setProperty("webdriver.chrome.driver",
-//                "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
-//        WebDriver webDriver = new ChromeDriver();
-//        webDriver.get("http://192.168.163.128/opencart/upload/");
-//        //WebElement logInList = webDriver.findElement(By.className("dropdown"));
-//        webDriver.findElement(By.className("dropdown")).click();
-//        webDriver.findElement(By.cssSelector("a[href=\"http://192.168.163.128/opencart/upload/index.php?route=account/login\"]")).click();
-//
-//        try {
-//            webDriver.wait();
-//        } catch (IllegalMonitorStateException e) {
-//            System.out.println("Continue");
-//        }
-//        //fillForm
-//        webDriver.findElement(By.cssSelector("div.form-group input[name=\"email\"]")).sendKeys(EMAIL);
-//        webDriver.findElement(By.cssSelector("div.form-group input[name=\"password\"]")).sendKeys(PASSWORD);
-//        webDriver.findElement(By.cssSelector("input[class = \"btn btn-primary\"]")).click();
-//        //webDriver.quit();
-//    }
-
     public void logInSearchingAddDelete() throws InterruptedException {
-        System.setProperty("webdriver.chrome.driver",
-                "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
-        WebDriver webDriver = new ChromeDriver();
-        webDriver.get("http://192.168.163.128/opencart/upload/");
-        webDriver.findElement(By.className("dropdown")).click();
-        webDriver.findElement(By.cssSelector("a[href=\"http://192.168.163.128/opencart/upload/index.php?route=account/login\"]")).click();
+        Selenide.open("http://192.168.163.130/opencart/upload/");
+
+        SelenideDriver webDriver = WebDriverRunner.getSelenideDriver();
+        //SelenideDriver driver = new ChromeDriver();
+
+        webDriver.$(By.className("dropdown")).click();
+        webDriver.$(By.xpath("//li/a[contains(text(),'Login')]")).click();
 
         //fillForm
-        webDriver.findElement(By.cssSelector("div.form-group input[" +
+        webDriver.$(By.cssSelector("div.form-group input[" +
                 "name=\"email\"]")).sendKeys(EMAIL);
-        webDriver.findElement(By.cssSelector("div.form-group input[name=\"password\"]")).sendKeys(PASSWORD);
-        webDriver.findElement(By.cssSelector("input[class = \"btn btn-primary\"]")).click();
-        Thread.sleep(3000);
-        //searching
-        try {
-            webDriver.wait(5000);
-        } catch (IllegalMonitorStateException e) {
-            System.out.println("wait until connection");
-        }
-//        synchronized (webDriver){
-//                webDriver.wait(5000);
-//        }
-        //searching the mac
-        webDriver.findElement(By.cssSelector("input[name=\"search\"]")).click();
-        webDriver.findElement(By.cssSelector("input[name=\"search\"]")).clear();
-        webDriver.findElement(By.cssSelector("input[name=\"search\"]")).sendKeys("mac");
-        webDriver.findElement(By.cssSelector("button[class=\"btn btn-default btn-lg\"]")).click();
-        Thread.sleep(3000);
-        try {
-            webDriver.wait(5000);
-        } catch (IllegalMonitorStateException e) {
-            System.out.println("wait to add");
-        }
+        webDriver.$(By.cssSelector("div.form-group input[name=\"password\"]")).sendKeys(PASSWORD);
+        webDriver.$(By.cssSelector("input[class = \"btn btn-primary\"]")).click();
+        Selenide.sleep(5000);
+
+        System.out.println("wait to add");
+        webDriver.$(By.cssSelector("input[name=\"search\"]")).click();
+        webDriver.$(By.cssSelector("input[name=\"search\"]")).clear();
+        webDriver.$(By.cssSelector("input[name=\"search\"]")).sendKeys("mac");
+        webDriver.$(By.cssSelector("button[class=\"btn btn-default btn-lg\"]")).click();
+        Selenide.sleep(5000);
         //add to cart
-        webDriver.findElement(By.cssSelector("button[onclick=\"cart.add('45', '1');\"]")).click();
+        webDriver.$(By.xpath("//div[contains(@class,'caption')]/h4/a[contains(text(),'MacBook Pro')]" +
+                "/../../following-sibling::div/button[contains(@onclick,'cart.add')]")).click();
+
 
         //go to my cart page
-        webDriver.findElement(By.cssSelector("#cart")).click();
-        Thread.sleep(2000);
-        webDriver.findElement(By.cssSelector(".text-right i[class=\"fa fa-shopping-cart\"]")).click();
-        Thread.sleep(3000);
-        try {
-            webDriver.wait(5000);
-        } catch (IllegalMonitorStateException e) {
-            System.out.println("wait to add");
-        }
-        WebElement element = webDriver.findElement(By.cssSelector("table[class=\"table table-bordered\"] td[class=\"text-left\"] a"));
+        webDriver.$(By.cssSelector("#cart")).click();
+        Selenide.sleep(2000);
+        webDriver.$(By.cssSelector(".text-right i[class=\"fa fa-shopping-cart\"]")).click();
+        Selenide.sleep(5000);
+        System.out.println("wait to add");
+        WebElement element = webDriver.$(By.cssSelector("table[class=\"table table-bordered\"] td[class=\"text-left\"] a"));
         assertEquals("MacBook Pro", element.getText(), "The MacBook Pro has not been added");
 
         //delete from cart
-        webDriver.findElement(By.cssSelector("#cart")).click();
-        webDriver.findElement(By.cssSelector("#cart button[class=\"btn btn-danger btn-xs\"]")).click();
-        try {
-            webDriver.wait(5000);
-        } catch (IllegalMonitorStateException e) {
-            System.out.println("wait until delete");
-        }
-        Thread.sleep(5000);
-        WebElement emptyCart = webDriver.findElement(By.cssSelector("#content p"));
+        webDriver.$(By.cssSelector("#cart")).click();
+        webDriver.$(By.cssSelector("#cart button[class=\"btn btn-danger btn-xs\"]")).click();
+        System.out.println("wait until delete");
+        Selenide.sleep(5000);
+        WebElement emptyCart = webDriver.$(By.cssSelector("#content p"));
         assertEquals("Your shopping cart is empty!", emptyCart.getText());
-        Thread.sleep(5000);
-        webDriver.quit();
+        Selenide.sleep(5000);
     }
 
     public void noNameTest(String phone1, String phone2, String phone3) throws InterruptedException {
         System.setProperty("webdriver.chrome.driver",
                 "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
         WebDriver webDriver = new ChromeDriver();
-        webDriver.get("http://192.168.163.128/opencart/upload/");
+        webDriver.get("http://192.168.163.130/opencart/upload/");
         webDriver.findElement(By.className("dropdown")).click();
-        webDriver.findElement(By.cssSelector("a[href=\"http://192.168.163.128/opencart/upload/index.php?route=account/login\"]")).click();
+        webDriver.findElement(By.cssSelector("a[href=\"http://192.168.163.129/opencart/upload/index.php?route=account/login\"]")).click();
         //fillForm
         webDriver.findElement(By.cssSelector("div.form-group input[" +
                 "name=\"email\"]")).sendKeys(EMAIL);
@@ -150,7 +111,8 @@ public class AddToCart {
         //go to cart page
         webDriver.findElement(By.cssSelector("div#cart")).click();
         Thread.sleep(3000);
-        webDriver.findElement(By.cssSelector("div#cart a[href=\"http://192.168.163.128/opencart/upload/index.php?route=checkout/cart\"]")).click();
+        webDriver.findElement(By.cssSelector("div#cart " +
+                "a[href=\"http://192.168.163.128/opencart/upload/index.php?route=checkout/cart\"]")).click();
         Thread.sleep(5000);
         System.out.println("go to cart page");
         //multiple all elements
@@ -163,19 +125,23 @@ public class AddToCart {
         Thread.sleep(5000);
         webDriver.findElement(By.xpath("//td/a[contains(text(),'iPhone')]/../following-sibling::td/div/input")).click();
         webDriver.findElement(By.xpath("//td/a[contains(text(),'iPhone')]/../following-sibling::td/div/input")).clear();
-        webDriver.findElement(By.xpath("//td/a[contains(text(),'iPhone')]/../following-sibling::td/div/input")).sendKeys(phone2);
+        webDriver.findElement(By.xpath("//td/a[contains(text(),'iPhone')]/../following-sibling::td/div/input"))
+                .sendKeys(phone2);
         Thread.sleep(5000);
-        webDriver.findElement(By.xpath("//td/a[contains(text(),'Palm Treo Pro')]/../following-sibling::td/div/input")).click();
-        webDriver.findElement(By.xpath("//td/a[contains(text(),'Palm Treo Pro')]/../following-sibling::td/div/input")).clear();
-        webDriver.findElement(By.xpath("//td/a[contains(text(),'Palm Treo Pro')]/../following-sibling::td/div/input")).sendKeys(phone3);
+        webDriver.findElement(By.xpath("//td/a[contains(text(),'Palm Treo Pro')]" +
+                "/../following-sibling::td/div/input")).click();
+        webDriver.findElement(By.xpath("//td/a[contains(text(),'Palm Treo Pro')]" +
+                "/../following-sibling::td/div/input")).clear();
+        webDriver.findElement(By.xpath("//td/a[contains(text(),'Palm Treo Pro')]" +
+                "/../following-sibling::td/div/input")).sendKeys(phone3);
         webDriver.findElement(By.cssSelector("button[type=\"submit\"]")).click();
         System.out.println("multiple all elements");
         Thread.sleep(5000);
         //check if all my phones is really added
         String countOfPhonesAndSum = webDriver.findElement(By.xpath("//span[contains(text(), 'item(s)')]")).getText();
         String[] mass = countOfPhonesAndSum.split(" ");
-        Assert.assertEquals("300", mass[0]);
-        Assert.assertEquals("$48,099.00", mass[mass.length - 1]);
+        assertEquals("300", mass[0]);
+        assertEquals("$48,099.00", mass[mass.length - 1]);
         System.out.println("check if all my phones is really added");
         //delete each one
         webDriver.findElement(By.cssSelector("button[class=\"btn btn-danger\"]")).click();
@@ -186,7 +152,8 @@ public class AddToCart {
         Thread.sleep(5000);
         System.out.println("delete each one");
         //check if they dead
-        String countOfPhonesAndSumAfterDelete = webDriver.findElement(By.xpath("//span[contains(text(), 'item(s)')]")).getText();
+        String countOfPhonesAndSumAfterDelete = webDriver.findElement(By.xpath("//span[contains(text(), 'item(s)')]"))
+                .getText();
         assertEquals("0 item(s) - $0.00", countOfPhonesAndSumAfterDelete, "the items did not delete");
         webDriver.quit();
     }
@@ -203,9 +170,10 @@ public class AddToCart {
         System.setProperty("webdriver.chrome.driver",
                 "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
         WebDriver webDriver = new ChromeDriver();
-        webDriver.get("http://192.168.163.128/opencart/upload/");
+        webDriver.get("http://192.168.163.130/opencart/upload/");
         webDriver.findElement(By.className("dropdown")).click();
-        webDriver.findElement(By.cssSelector("a[href=\"http://192.168.163.128/opencart/upload/index.php?route=account/login\"]")).click();
+        webDriver.findElement(By.cssSelector(
+                "a[href=\"http://192.168.163.130/opencart/upload/index.php?route=account/login\"]")).click();
         //fillForm
         webDriver.findElement(By.cssSelector("div.form-group input[" +
                 "name=\"email\"]")).sendKeys(EMAIL);
@@ -216,11 +184,13 @@ public class AddToCart {
         webDriver.findElement(By.cssSelector("#logo")).click();
         Thread.sleep(5000);
         //add to cart by another way
-        webDriver.findElement(By.xpath("//div[contains(@class,'row')]//h4/a[contains(text(),'Apple Cinema 30')]")).click();
+        webDriver.findElement(By.xpath("//div[contains(@class,'row')]//h4/a[contains(text(),'Apple Cinema 30')]"))
+                .click();
         Thread.sleep(5000);
         webDriver.findElement(By.cssSelector("button[class=\"btn btn-primary btn-lg btn-block\"]")).click();
         Thread.sleep(5000);
         webDriver.findElement(By.name("option[218]")).click();
+        //"//div[contains(@class,'form-group required')]/div/div/label/input[contains(text(),'')]"
         webDriver.findElement(By.name("option[223][]")).click();
         webDriver.findElement(By.cssSelector("#input-option208")).click();
         webDriver.findElement(By.cssSelector("#input-option208")).clear();
@@ -256,7 +226,7 @@ public class AddToCart {
         Thread.sleep(5000);
         String countOfPhonesAndSum = webDriver.findElement(By.xpath("//span[contains(text(), 'item(s)')]")).getText();
         String[] mass = countOfPhonesAndSum.split(" ");
-        Assert.assertEquals("2", mass[0]);
+        assertEquals("2", mass[0]);
         Thread.sleep(3000);
         //conformation
         webDriver.findElement(By.cssSelector("div[class=\"pull-right\"] ")).click();
@@ -320,7 +290,7 @@ public class AddToCart {
         String infoAboutOrderFromSecond = webDriver.findElement(By.cssSelector("table[class=\"table table-bordered" +
                 " table-hover\"] tbody .text-left ")).getText();
         infoAboutOrderFromSecond = infoAboutOrderFromSecond.replaceAll(":\\s", " ");
-        infoAboutOrderFromSecond = infoAboutOrderFromSecond.replaceAll("\\s-","-");
+        infoAboutOrderFromSecond = infoAboutOrderFromSecond.replaceAll("\\s-", "-");
         assertNotEquals(infoAboutOrderFromFirst, infoAboutOrderFromSecond, "The orders do not equal");
 
         webDriver.findElement(By.cssSelector("input[value=\"Confirm Order\"]")).click();
@@ -336,7 +306,7 @@ public class AddToCart {
         System.setProperty("webdriver.chrome.driver",
                 "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chromedriver.exe");
         WebDriver webDriver = new ChromeDriver();
-        webDriver.get("http://192.168.163.128/opencart/upload/");
+        webDriver.get("http://192.168.163.130/opencart/upload/");
         webDriver.findElement(By.xpath("//ul[contains(@class,'nav navbar-nav')]/li/a[contains(text(),'MP3 Players')]"))
                 .click();
         Thread.sleep(2000);
@@ -361,7 +331,7 @@ public class AddToCart {
         webDriver.findElement(By.cssSelector("input[id=\"button-coupon\"]")).click();
         Thread.sleep(3000);
         String coupon = webDriver.findElement(By.cssSelector("div[class=\"alert alert-danger\"]")).getText();
-        assertEquals("Warning: Coupon is either invalid, expired or reached its usage limit!\n×",coupon,
+        assertEquals("Warning: Coupon is either invalid, expired or reached its usage limit!\n×", coupon,
                 "It is magic - coupon works");
         webDriver.findElement(By.xpath("//div[contains(@class,'panel panel-default')]" +
                 "//a[contains(text(),'Estimate Shipping & Taxes')]")).click();
@@ -377,7 +347,7 @@ public class AddToCart {
         webDriver.findElement(By.cssSelector("#input-postcode")).sendKeys("123");
         webDriver.findElement(By.cssSelector("button[id=\"button-quote\"]")).click();
         Thread.sleep(2000);
-        assertEquals("Flat Shipping Rate - $8.00",webDriver.findElement(By.cssSelector(".radio label")).getText(),
+        assertEquals("Flat Shipping Rate - $8.00", webDriver.findElement(By.cssSelector(".radio label")).getText(),
                 "The quotes has been changed");
         Thread.sleep(2000);
         webDriver.findElement(By.cssSelector("input[name=\"shipping_method\"]")).click();
@@ -395,7 +365,7 @@ public class AddToCart {
                 "It is a magic - a Gift Certificate works ");
         webDriver.findElement(By.cssSelector("a[class=\"btn btn-primary\"]")).click();
         Thread.sleep(1000);
-        assertEquals("Checkout Options:",webDriver.findElement(By.cssSelector("#content p")).getText()
+        assertEquals("Checkout Options:", webDriver.findElement(By.cssSelector("#content p")).getText()
                 , "Unbelievable, a product should not add");
         Thread.sleep(2000);
         webDriver.findElement(By.cssSelector("#input-email")).click();
@@ -471,8 +441,10 @@ public class AddToCart {
         webDriver.quit();
     }
 
-    public void wrongData(){
-
+    public void wrongData() {
+        Selenide.open("http://192.168.163.130/opencart/upload/");
+        SelenideDriver webDriver = WebDriverRunner.getSelenideDriver();
+        webDriver.$(By.xpath("\"//ul[contains(@class,'nav navbar-nav')]/li/a[contains(text(),'Cameras')]\"")).click();
     }
 
 
